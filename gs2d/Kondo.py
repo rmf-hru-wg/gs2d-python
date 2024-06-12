@@ -1,5 +1,6 @@
 import time
 import logging
+import serial
 from types import FunctionType
 from packaging.version import Version
 
@@ -72,9 +73,13 @@ class KondoICS(Driver):
         """初期化
         """
 
+        super(KondoICS, self).__init__(serial_interface, command_handler_class)
         self.loopback:bool = bool(loopback)
         self.slave:bool = bool(slave)
         self.baudrate = 115200
+        if isinstance(self.command_handler.serial_interface.ser, serial.Serial):
+            self.baudrate = self.command_handler.serial_interface.ser.baudrate
+            self.command_handler.serial_interface.ser.parity = serial.PARITY_EVEN
 
         if version == "3.6":
             self.version = Version("3.6")
